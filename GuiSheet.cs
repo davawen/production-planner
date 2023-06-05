@@ -10,10 +10,14 @@ public partial class GuiSheet : PanelContainer {
 
     public override void _Ready() {
 		var grid = GetNode<GridContainer>("MarginContainer/GridContainer");
+		var cell_scene = GD.Load<PackedScene>("res://cell.tscn");
 
 		linked = new Sheet(width, height);
 		foreach (var cell in linked.cells.Values) {
-			var gui_cell = new GuiCell(cell);
+			var gui_cell = cell_scene.Instantiate<GuiCell>();
+			gui_cell.linked = cell;
+			cell.gui = gui_cell;
+
 			grid.AddChild(gui_cell);
 		}
     }

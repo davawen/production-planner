@@ -10,6 +10,8 @@ public class Cell {
 
 	public Ast? parsed;
 	public float? computed;
+	
+	public GuiCell? gui;
 
 	public List<Cell> depends_on;
 	public HashSet<Cell> depended_on;
@@ -34,14 +36,14 @@ public class Cell {
 		if (new_input.StartsWith('=')) {
 			var lexer = new Tokenizer(new_input.Substring(1));
 			var parser = new Parser(lexer, parent);
-			GD.Print($"Parsing {this.name}");
+			// GD.Print($"Parsing {this.name}");
 
 			this.parsed = parser.pratt();
 			if (this.parsed == null) {
 				GD.Print("Error in parsing");
 			} else {
-				GD.Print("Tree: ");
-				GD.Print(String.Join("\n", as_string(this.parsed)));
+				// GD.Print("Tree: ");
+				// GD.Print(String.Join("\n", as_string(this.parsed)));
 			}
 		}
 
@@ -95,8 +97,15 @@ public class Cell {
 		this.computed = null;
 		if (this.parsed == null) return;
 
+		GD.Print($"Evaluating {this.name}");
 		this.computed = this.eval(this.parsed);
+		if (this.gui != null) {
+			this.gui.compute_text();
+		}
+
 		foreach (var cell in this.depended_on) {
+			GD.Print($"Depended on by {cell.name}, recomputing");
+
 			cell.compute();
 		}
 	}
