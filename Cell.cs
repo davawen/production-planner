@@ -2,12 +2,11 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class Cell
-{
-	public String name;
+public class Cell {
+	public string name;
 	public Sheet parent;
 
-	public String input;
+	public string input;
 
 	public Ast? parsed;
 	public float? computed;
@@ -15,7 +14,7 @@ public class Cell
 	public List<Cell> depends_on;
 	public HashSet<Cell> depended_on;
 
-	public Cell(String name, Sheet parent) {
+	public Cell(string name, Sheet parent) {
 		this.name = name;
 		this.parent = parent;
 
@@ -27,7 +26,7 @@ public class Cell
 		this.depended_on = new HashSet<Cell>();
 	}
 
-	public void update_input(String new_input) {
+	public void update_input(string new_input) {
 		if (this.input == new_input) return;
 
 		this.input = new_input;
@@ -35,7 +34,15 @@ public class Cell
 		if (new_input.StartsWith('=')) {
 			var lexer = new Tokenizer(new_input.Substring(1));
 			var parser = new Parser(lexer, parent);
+			GD.Print($"Parsing {this.name}");
+
 			this.parsed = parser.pratt();
+			if (this.parsed == null) {
+				GD.Print("Error in parsing");
+			} else {
+				GD.Print("Tree: ");
+				GD.Print(String.Join("\n", as_string(this.parsed)));
+			}
 		}
 
 		this.reset_dependencies();
@@ -66,11 +73,32 @@ public class Cell
 		}
 	}
 
+	List<string> as_string(Ast ast) {
+		switch (ast) {
+			case Ast.Number n:
+				return new List<string>{ n.value.ToString() };
+			case Ast.Cell c:
+				return new List<string>{ c.cell.name };
+			case Ast.BinaryOp op:
+				var str = new List<String>{ op.op.ToString() };
+				str.AddRange(as_string(op.lhs));
+				str.AddRange(as_string(op.rhs));
+				for (int i = 1; i < str.Count; i++) {
+					str[i] = "  " + str[i];
+				}
+				return str;
+		}
+		return new List<string>();
+	}
+
 	public void compute() {
 		this.computed = null;
 		if (this.parsed == null) return;
 
 		this.computed = this.eval(this.parsed);
+		foreach (var cell in this.depended_on) {
+			cell.compute();
+		}
 	}
 
 	float? eval_binary_op(Ast.BinaryOp op) {

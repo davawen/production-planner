@@ -1,14 +1,12 @@
-using Godot;
 using System;
 using System.Collections.Generic;
 
-public partial class Sheet : Node
-{
+public class Sheet {
 	private int width;
 	private int height;
-	private Dictionary<String, Cell> cells;
+	public Dictionary<string, Cell> cells { get; private set; }
 
-	public Sheet(int width, int height) {
+    public Sheet(int width, int height) {
 		this.width = width;
 		this.height = height;
 		this.cells = new Dictionary<string, Cell>();
@@ -24,7 +22,7 @@ public partial class Sheet : Node
 		}
 	}
 
-	public Cell? get_cell(String position) {
+	public Cell? get_cell(string position) {
 		if (!cells.ContainsKey(position)) return null;
 
 		return cells[position];

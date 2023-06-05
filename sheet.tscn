@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://bh8ytn1rpsfef"]
 
-[ext_resource type="Script" path="res://gui_sheet.gd" id="1_30fhl"]
+[ext_resource type="Script" path="res://GuiSheet.cs" id="1_3iwmr"]
 
 [node name="PanelContainer" type="PanelContainer"]
 anchors_preset = 8
@@ -14,7 +14,7 @@ offset_right = 210.0
 offset_bottom = 144.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_30fhl")
+script = ExtResource("1_3iwmr")
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 2

@@ -13,7 +13,7 @@ public enum Operation {
 
 public abstract record Token {
 	public record Number(float value) : Token{}
-	public record Cell(String position) : Token{}
+	public record Cell(string position) : Token{}
 	public record Op(Operation op) : Token{}
 	public record Eof() : Token{}
 }
@@ -21,10 +21,10 @@ public abstract record Token {
 public class Tokenizer {
 	private Queue<Token> queue;
 
-	public Tokenizer(String str) {
+	public Tokenizer(string str) {
 		this.queue = new Queue<Token>();
 		Regex isalphanum = new Regex("[a-zA-Z0-9.]");
-		String acc = "";
+		string acc = "";
 
 		var push_token = () => {
 			if (acc.Length == 0) return;
@@ -34,6 +34,7 @@ public class Tokenizer {
 			} else {
 				this.queue.Enqueue(new Token.Cell(acc));
 			}
+			acc = "";
 		};
 
 		foreach (var c in str) {
@@ -150,7 +151,7 @@ public class Parser {
 	public Ast? pratt(int power = 0) {
 		var t = this.lexer.next();
 		var left = this.nud(t);
-		while (this.lbp(this.lexer.next()) > power) {
+		while (this.lbp(this.lexer.peek()) > power) {
 			if (left == null) return null;
 
 			t = this.lexer.next();
