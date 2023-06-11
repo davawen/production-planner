@@ -15,6 +15,8 @@ public abstract record Token {
 	public record Number(float value) : Token{}
 	public record Cell(string position) : Token{}
 	public record Op(Operation op) : Token{}
+	public record LParen() : Token{}
+	public record RParen() : Token{}
 	public record Eof() : Token{}
 }
 
@@ -43,17 +45,19 @@ public class Tokenizer {
 			} else {
 				push_token();
 
-				Operation? op = c switch {
-					'+' => Operation.PLUS,
-					'-' => Operation.MINUS,
-					'*' => Operation.TIMES,
-					'/' => Operation.DIV,
+				Token? op = c switch {
+					'+' => new Token.Op(Operation.PLUS),
+					'-' => new Token.Op(Operation.MINUS),
+					'*' => new Token.Op(Operation.TIMES),
+					'/' => new Token.Op(Operation.DIV),
+					'(' => new Token.LParen(),
+					')' => new Token.RParen(),
 					_ => null
 				};
 
-				if (op == null) continue;
-
-				this.queue.Enqueue(new Token.Op((Operation)op));
+				if (op != null) {
+					this.queue.Enqueue(op);
+				}
 			}
 		}
 
@@ -108,7 +112,7 @@ public class Parser {
 				Operation.TIMES or Operation.DIV => 30,
 				_ => throw new ArgumentException()
 			},
-			Token.Eof => 0,
+			Token.RParen or Token.Eof => 0,
 			_ => null,
 		};
 	}
@@ -121,6 +125,13 @@ public class Parser {
 				var cell = this.parent.get_cell(c.position);
 				if (cell == null) return null;
 				return new Ast.Cell(cell);
+			case Token.LParen:
+				var inner = this.pratt(0);
+				var next = this.lexer.next();
+				if (next is not Token.RParen) {
+					return null;
+				}
+				return inner; 
 			default:
 				return null;
 		};

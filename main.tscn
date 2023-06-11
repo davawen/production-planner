@@ -23,3 +23,10 @@ offset_right = 526.0
 offset_bottom = 263.0
 grow_horizontal = 1
 grow_vertical = 1
+
+[node name="PanelContainer" parent="." instance=ExtResource("1_dmlb5")]
+layout_mode = 1
+offset_left = -12.0
+offset_top = 14.0
+offset_right = 514.0
+offset_bottom = 277.0

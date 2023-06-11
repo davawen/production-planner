@@ -7,19 +7,13 @@ public partial class GuiCell : LineEdit {
     public override void _Ready() {
 		FocusEntered += () => this.Text = this.linked.input;
 
-		TextSubmitted += new_text => submit(new_text);
-		FocusExited += () => submit(this.Text);
+		TextSubmitted += _new_text => ReleaseFocus();
+		FocusExited += () => linked.update_input(this.Text);
     }
 
 	public void compute_text() {
 		if (linked.computed != null) {
 			this.Text = $"{linked.computed}";
 		}
-	}
-
-	void submit(string new_text) {
-		linked.update_input(new_text);
-
-		ReleaseFocus();
 	}
 }
